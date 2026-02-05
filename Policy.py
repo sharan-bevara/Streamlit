@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title("Insurance Policy Application")
+st.title("Streamlit")
 
 # Use a form to batch inputs
 with st.form("policy_form"):
@@ -32,3 +32,4 @@ if submitted:
 else:
     if name:  # Preview if partially filled
         st.info("Fill all fields and submit to apply.")
+
