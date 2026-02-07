@@ -1,12 +1,36 @@
 import streamlit as st
 import os
+from openai import OpenAI
 
+# ---------- CHATGPT FUNCTION ----------
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def get_policy_response(name, age, phone, policy_no):
+    prompt = f"""
+    Name: {name}
+    Age: {age}
+    Phone: {phone}
+    Policy Number: {policy_no}
+
+    Provide policy info clearly.
+    """
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a helpful insurance assistant."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return response.choices[0].message.content
+
+# ---------- UI ----------
 st.set_page_config(page_title="Policy Assistant", layout="centered")
 
 st.title("🛡️ Policy Information Assistant")
 st.write("Enter your details below 👇")
 
-# UI ALWAYS loads
 name = st.text_input("Full Name")
 age = st.number_input("Age", 0, 120)
 phone = st.text_input("Phone Number")
@@ -18,4 +42,5 @@ if st.button("Get Policy Information"):
     if not (name and phone and policy_no):
         st.error("Please fill in all required fields")
     else:
-        st.info("UI working fine 👍 (API call will be added next)")
+        reply = get_policy_response(name, age, phone, policy_no)
+        st.write(reply)
