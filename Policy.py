@@ -1,5 +1,4 @@
 import streamlit as st
-from openai import OpenAI
 import os
 
 # Initialize OpenAI client
@@ -54,3 +53,4 @@ if st.button("Get Policy Information"):
 
     else:
         st.error("Please fill in all required fields.")
+
