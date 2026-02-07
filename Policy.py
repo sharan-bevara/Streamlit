@@ -3,7 +3,7 @@ import os
 from openai import OpenAI
 
 # ---------- CHATGPT FUNCTION ----------
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("sk-...xKEA"))
 
 def get_policy_response(name, age, phone, policy_no):
     prompt = f"""
@@ -44,3 +44,4 @@ if st.button("Get Policy Information"):
     else:
         reply = get_policy_response(name, age, phone, policy_no)
         st.write(reply)
+
