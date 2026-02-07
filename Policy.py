@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-import OpenAI
+from openai import OpenAI
 
 # ---------- CHATGPT FUNCTION ----------
 client = OpenAI(api_key=os.getenv("sk-...xKEA"))
@@ -44,5 +44,26 @@ if st.button("Get Policy Information"):
     else:
         reply = get_policy_response(name, age, phone, policy_no)
         st.write(reply)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+def ask_gpt(prompt):
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.choices[0].message.content
+
+st.title("Policy Assistant")
+
+name = st.text_input("Name")
+policy = st.text_input("Policy number")
+
+if st.button("Check"):
+    if name and policy:
+        reply = ask_gpt(f"Give policy info for {name} with policy {policy}")
+        st.write(reply)
+    else:
+        st.error("Fill all fields")
+        
+        
 
