@@ -1,35 +1,56 @@
 import streamlit as st
+from openai import OpenAI
+import os
 
-st.title("Streamlit")
+# Initialize OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Use a form to batch inputs
-with st.form("policy_form"):
-    st.header("Customer Details")
-    name = st.text_input("Full Name")
-    age = st.number_input("Age", min_value=18, max_value=100)
-    email = st.text_input("Email")
-    
-    st.header("Policy Details")
-    policy_type = st.selectbox("Policy Type", ["Health", "Life", "Vehicle"])
-    coverage = st.slider("Coverage Amount ($)", 10000, 1000000, 50000)
-    smoker = st.checkbox("Smoker (for health/life)")
-    
-    submitted = st.form_submit_button("Apply for Policy")
+st.set_page_config(page_title="Policy ChatGPT Assistant", layout="centered")
 
-if submitted:
-    # Simple premium calculation logic (base + age factor + smoker premium)
-    base_premium = coverage * 0.005  # 0.5% of coverage
-    age_factor = (age - 18) * 10
-    smoker_premium = 500 if smoker and policy_type in ["Health", "Life"] else 0
-    total_premium = base_premium + age_factor + smoker_premium
-    
-    st.success("Policy Applied Successfully!")
-    st.write(f"**Name:** {name}")
-    st.write(f"**Policy:** {policy_type}")
-    st.write(f"**Coverage:** ${coverage:,.0f}")
-    st.write(f"**Annual Premium:** ${total_premium:,.2f}")
-    st.balloons()
-else:
-    if name:  # Preview if partially filled
-        st.info("Fill all fields and submit to apply.")
+st.title("🛡️ Policy Information Assistant")
+st.write("Enter your details to get policy information via ChatGPT.")
 
+# User inputs
+name = st.text_input("Full Name")
+age = st.number_input("Age", min_value=0, max_value=120, step=1)
+phone = st.text_input("Phone Number")
+policy_no = st.text_input("Policy Number")
+
+if st.button("Get Policy Information"):
+    if name and phone and policy_no:
+        with st.spinner("ChatGPT is analyzing your policy..."):
+
+            prompt = f"""
+            You are an insurance assistant.
+
+            User Details:
+            Name: {name}
+            Age: {age}
+            Phone Number: {phone}
+            Policy Number: {policy_no}
+
+            Provide a clear and friendly policy summary including:
+            - Policy type
+            - Coverage amount
+            - Policy status
+            - Validity
+            - Any important notes
+            """
+
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You are a helpful insurance assistant."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.4
+            )
+
+            policy_info = response.choices[0].message.content
+
+        st.success("Policy details retrieved!")
+        st.subheader("📄 Policy Information")
+        st.write(policy_info)
+
+    else:
+        st.error("Please fill in all required fields.")
