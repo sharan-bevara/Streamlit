@@ -19,7 +19,7 @@ if st.button("Get Policy Information"):
         st.error("Please fill in all required fields")
     else:
         # Initialize OpenAI client
-        client = OpenAI(api_key=os.getenv(("sk-...xKEA"))
+        client = OpenAI(api_key=os.getenv("sk-...xKEA"))
 
         # Build the prompt
         prompt = f"""
@@ -50,5 +50,6 @@ Provide a friendly summary of the user's policy including:
         st.success("Policy details retrieved!")
         st.subheader("📄 Policy Information")
         st.write(response.output_text)
+
 
 
