@@ -1,6 +1,7 @@
 import streamlit as st
-import os
 from openai import OpenAI
+import os
+
 
 # ---------- CHATGPT FUNCTION ----------
 client = OpenAI(api_key=os.getenv("sk-...xKEA"))
@@ -66,4 +67,5 @@ if st.button("Check"):
         st.error("Fill all fields")
         
         
+
 
