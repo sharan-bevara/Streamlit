@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from openai import OpenAI
+import OpenAI
 
 # ---------- CHATGPT FUNCTION ----------
 client = OpenAI(api_key=os.getenv("sk-...xKEA"))
@@ -44,4 +44,5 @@ if st.button("Get Policy Information"):
     else:
         reply = get_policy_response(name, age, phone, policy_no)
         st.write(reply)
+
 
