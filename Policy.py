@@ -20,26 +20,44 @@ def set_bg():
             background-attachment: fixed;
         }}
 
-        /* Main panel (block-container) */
-        .block-container {{
-            background-color: rgba(30, 30, 30, 0.85);  /* Dark semi-transparent panel */
-            color: #F0F0F0;  /* Light text for readability */
+        /* Main content panel */
+        [data-testid="stAppViewContainer"] {{
+            background-color: rgba(30, 30, 30, 0.85) !important;
+            color: #F0F0F0 !important;
             padding: 2rem;
             border-radius: 15px;
         }}
 
-        /* Headings inside block-container */
-        .block-container h1, 
-        .block-container h2, 
-        .block-container h3 {{
-            color: #FFFFFF;
+        /* Text inside the main panel */
+        [data-testid="stText"] {{
+            color: #F0F0F0 !important;
         }}
 
-        /* Optional: style buttons to stand out */
+        /* Headings */
+        h1, h2, h3 {{
+            color: #FFFFFF !important;
+        }}
+
+        /* Buttons */
         .stButton>button {{
-            background-color: #0099FF;
-            color: white;
-            border-radius: 8px;
+            background-color: #0099FF !important;
+            color: white !important;
+            border-radius: 8px !important;
+        }}
+
+        /* Sidebar (menu) background - skin color */
+        [data-testid="stSidebar"] {{
+            background-color: #fddbb0 !important; /* skin color */
+        }}
+
+        /* Top-right menu / header - skin color */
+        [data-testid="stHeader"] {{
+            background-color: #fddbb0 !important; /* skin color */
+        }}
+
+        /* Optional: sidebar text color */
+        [data-testid="stSidebar"] * {{
+            color: #000000 !important; /* black text for contrast */
         }}
         </style>
         """,
@@ -149,3 +167,4 @@ if st.button("💡 Suggest More Policies"):
 
         st.success("Recommended Policies")
         st.write(suggestions)
+
