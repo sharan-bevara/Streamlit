@@ -1,72 +1,134 @@
 import streamlit as st
 from openai import OpenAI
-import os
 
+# ---------- PAGE CONFIG ----------
+st.set_page_config(page_title="Policy Assistant", layout="centered")
 
-# ---------- CHATGPT FUNCTION ----------
-client = OpenAI(api_key=os.getenv("sk-...xKEA"))
+# ---------- BACKGROUND IMAGE ----------
+def set_bg():
+    bg_url = "https://images.unsplash.com/photo-1521791136064-7986c2920216"
 
-def get_policy_response(name, age, phone, policy_no):
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("{bg_url}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }}
+
+        .block-container {{
+            background-color: rgba(255,255,255,0.9);
+            padding: 2rem;
+            border-radius: 15px;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+set_bg()
+
+# ---------- TITLE ----------
+st.title("🛡️ Streamlit")
+
+# ---------- OPENAI ----------
+client = OpenAI(api_key=st.secrets["Open_API_Key"])
+
+# ---------- FUNCTIONS ----------
+
+def generate_policy_details(name, age, gender, phone, policy_no, policy_name):
+
     prompt = f"""
-    Name: {name}
-    Age: {age}
-    Phone: {phone}
-    Policy Number: {policy_no}
+Customer Details:
+Name: {name}
+Age: {age}
+Gender: {gender}
+Phone: {phone}
+Policy Number: {policy_no}
+Policy Name: {policy_name}
 
-    Provide policy info clearly.
-    """
+Explain the policy clearly with:
+- Coverage
+- Benefits
+- Premium
+- Maturity
+- Claim process
+"""
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are a helpful insurance assistant."},
+            {"role": "system", "content": "You are an insurance assistant."},
             {"role": "user", "content": prompt}
-        ]
+        ],
+        temperature=0.3
     )
 
     return response.choices[0].message.content
 
-# ---------- UI ----------
-st.set_page_config(page_title="Policy Assistant", layout="centered")
 
-st.title("🛡️ Policy Information Assistant")
-st.write("Enter your details below 👇")
+def suggest_policies(age, gender):
+
+    prompt = f"""
+Suggest 5 best insurance policies for:
+Age: {age}
+Gender: {gender}
+
+Include:
+- policy name
+- premium range
+- why suitable
+"""
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are an insurance advisor."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.5
+    )
+
+    return response.choices[0].message.content
+
+
+# ---------- USER INPUT ----------
+st.subheader("Enter Customer Details")
 
 name = st.text_input("Full Name")
-age = st.number_input("Age", 0, 120)
+age = st.number_input("Age", 0, 100)
+gender = st.selectbox("Gender", ["Male", "Female", "Other"])
 phone = st.text_input("Phone Number")
 policy_no = st.text_input("Policy Number")
+policy_name = st.text_input("Policy Name")
 
 st.divider()
 
-if st.button("Get Policy Information"):
-    if not (name and phone and policy_no):
-        st.error("Please fill in all required fields")
+# ---------- BUTTON 1 ----------
+if st.button("📄 Generate Policy Details"):
+    if not (name and phone and policy_no and policy_name):
+        st.error("Please fill all fields")
     else:
-        reply = get_policy_response(name, age, phone, policy_no)
+        with st.spinner("Generating policy details..."):
+            reply = generate_policy_details(
+                name, age, gender, phone, policy_no, policy_name
+            )
+
+        st.success("Policy Information")
         st.write(reply)
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def ask_gpt(prompt):
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return response.choices[0].message.content
+st.divider()
 
-st.title("Policy Assistant")
-
-name = st.text_input("Name")
-policy = st.text_input("Policy number")
-
-if st.button("Check"):
-    if name and policy:
-        reply = ask_gpt(f"Give policy info for {name} with policy {policy}")
-        st.write(reply)
+# ---------- BUTTON 2 ----------
+if st.button("💡 Suggest More Policies"):
+    if age == 0:
+        st.error("Please enter age")
     else:
-        st.error("Fill all fields")
-        
-        
+        with st.spinner("Finding best policies..."):
+            suggestions = suggest_policies(age, gender)
 
-
-
+        st.success("Recommended Policies")
+        st.write(suggestions)
