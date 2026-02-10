@@ -12,17 +12,17 @@ def set_bg():
         f"""
         <style>
         .stApp {{
-            background-image: url("{bg_url}");
+            background-image: url("{bg_url}");  /* Keeps the background image */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
         }}
 
-        /* Main content panel background (dark blue-gray) */
+        /* Main content panel (background and text color) */
         .block-container {{
-            background-color: rgb(54, 69, 79);  /* Dark blue-gray background */
-            color: #E0E0E0;  /* Light text for contrast */
+            background-color: rgba(54, 69, 79, 0.8);  /* Dark blue-gray background with transparency */
+            color: #E0E0E0;  /* Light gray text for contrast */
             padding: 2rem;
             border-radius: 15px;
         }}
@@ -34,16 +34,38 @@ def set_bg():
             color: #E0E0E0;  /* Light headings for readability */
         }}
 
-        /* Optional: style buttons to stand out */
+        /* Buttons */
         .stButton>button {{
             background-color: #00B0FF;  /* Vibrant blue button */
             color: white;
             border-radius: 8px;
         }}
+
+        /* Sidebar background - dark gray / navy */
+        [data-testid="stSidebar"] {{
+            background-color: #1F1F1F !important;  /* Dark gray / navy */
+            color: #E0E0E0 !important;  /* Light text */
+        }}
+
+        /* Sidebar text color */
+        [data-testid="stSidebar"] * {{
+            color: #E0E0E0 !important;  /* Light gray text for readability */
+        }}
+
+        /* Top-right menu / header - matching dark theme */
+        [data-testid="stHeader"] {{
+            background-color: #1F1F1F !important;  /* Dark gray / navy */
+        }}
+
+        /* Apply white color to input labels */
+        .stTextInput label, .stNumberInput label, .stSelectbox label {{
+            color: #FFFFFF !important;  /* White labels for input fields */
+        }}
         </style>
         """,
         unsafe_allow_html=True
     )
+
 
 set_bg()
 
@@ -148,6 +170,7 @@ if st.button("💡 Suggest More Policies"):
 
         st.success("Recommended Policies")
         st.write(suggestions)
+
 
 
 
