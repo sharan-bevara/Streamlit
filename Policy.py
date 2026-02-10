@@ -4,14 +4,13 @@ from openai import OpenAI
 # ---------- PAGE CONFIG ----------
 st.set_page_config(page_title="Policy Assistant", layout="centered")
 
-# ---------- BACKGROUND IMAGE & STYLING ----------
+# ---------- BACKGROUND IMAGE ----------
 def set_bg():
     bg_url = "https://images.unsplash.com/photo-1521791136064-7986c2920216"
 
     st.markdown(
         f"""
         <style>
-        /* App background image */
         .stApp {{
             background-image: url("{bg_url}");
             background-size: cover;
@@ -20,26 +19,10 @@ def set_bg():
             background-attachment: fixed;
         }}
 
-        /* Main panel (block-container) */
         .block-container {{
-            background-color: rgba(30, 30, 30, 0.85);  /* Dark semi-transparent panel */
-            color: #F0F0F0;  /* Light text for readability */
+            background-color: rgba(255,255,255,0.9);
             padding: 2rem;
             border-radius: 15px;
-        }}
-
-        /* Headings inside block-container */
-        .block-container h1, 
-        .block-container h2, 
-        .block-container h3 {{
-            color: #FFFFFF;
-        }}
-
-        /* Optional: style buttons to stand out */
-        .stButton>button {{
-            background-color: #0099FF;
-            color: white;
-            border-radius: 8px;
         }}
         </style>
         """,
