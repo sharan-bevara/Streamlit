@@ -20,40 +20,40 @@ def set_bg():
             background-attachment: fixed;
         }}
 
-        /* Main content panel (light gray semi-transparent background) */
+        /* Main content panel (dark background for dark mode) */
         [data-testid="stAppViewContainer"] {{
-            background-color: rgba(255, 255, 255, 0.85) !important;  /* Light gray for readability */
-            color: #333333 !important;  /* Dark text for good contrast */
+            background-color: #121212 !important;  /* Dark background */
+            color: #E0E0E0 !important;  /* Light gray text for readability */
             padding: 2rem;
             border-radius: 15px;
         }}
 
         /* Headings */
         h1, h2, h3 {{
-            color: #333333 !important;
+            color: #E0E0E0 !important;  /* Light gray for headings */
         }}
 
         /* Buttons */
         .stButton>button {{
-            background-color: #0099FF !important;  /* Bright blue */
+            background-color: #00B0FF !important;  /* Vibrant cyan-blue for contrast */
             color: white !important;
             border-radius: 8px !important;
         }}
 
-        /* Sidebar background - soft skin color */
+        /* Sidebar background - dark gray / navy */
         [data-testid="stSidebar"] {{
-            background-color: #f0c8a1 !important;  /* Soft skin tone */
-            color: #000000 !important;  /* Text contrast */
+            background-color: #1F1F1F !important;  /* Dark gray / navy */
+            color: #E0E0E0 !important;  /* Light text */
         }}
 
         /* Sidebar text color */
         [data-testid="stSidebar"] * {{
-            color: #000000 !important;
+            color: #E0E0E0 !important;  /* Light gray text for readability */
         }}
 
-        /* Top-right menu / header - soft skin color */
+        /* Top-right menu / header - matching dark theme */
         [data-testid="stHeader"] {{
-            background-color: #f0c8a1 !important;  /* Matching skin tone */
+            background-color: #1F1F1F !important;  /* Dark gray / navy */
         }}
         </style>
         """,
@@ -163,5 +163,6 @@ if st.button("💡 Suggest More Policies"):
 
         st.success("Recommended Policies")
         st.write(suggestions)
+
 
 
