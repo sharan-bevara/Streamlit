@@ -20,29 +20,30 @@ def set_bg():
             background-attachment: fixed;
         }}
 
-        /* Main content panel (dark semi-transparent for dark mode) */
+        /* Main content panel (light gray semi-transparent background) */
         [data-testid="stAppViewContainer"] {{
-            background-color: rgba(30, 30, 30, 0.85) !important;
-            color: #F0F0F0 !important;
+            background-color: rgba(255, 255, 255, 0.85) !important;  /* Light gray for readability */
+            color: #333333 !important;  /* Dark text for good contrast */
             padding: 2rem;
             border-radius: 15px;
         }}
 
         /* Headings */
         h1, h2, h3 {{
-            color: #FFFFFF !important;
+            color: #333333 !important;
         }}
 
         /* Buttons */
         .stButton>button {{
-            background-color: #0099FF !important;
+            background-color: #0099FF !important;  /* Bright blue */
             color: white !important;
             border-radius: 8px !important;
         }}
 
-        /* Sidebar (menu) background - skin color */
+        /* Sidebar background - soft skin color */
         [data-testid="stSidebar"] {{
-            background-color: #fddbb0 !important; /* skin tone */
+            background-color: #f0c8a1 !important;  /* Soft skin tone */
+            color: #000000 !important;  /* Text contrast */
         }}
 
         /* Sidebar text color */
@@ -50,9 +51,9 @@ def set_bg():
             color: #000000 !important;
         }}
 
-        /* Top-right menu / header - skin color */
+        /* Top-right menu / header - soft skin color */
         [data-testid="stHeader"] {{
-            background-color: #fddbb0 !important;
+            background-color: #f0c8a1 !important;  /* Matching skin tone */
         }}
         </style>
         """,
@@ -162,4 +163,5 @@ if st.button("💡 Suggest More Policies"):
 
         st.success("Recommended Policies")
         st.write(suggestions)
+
 
