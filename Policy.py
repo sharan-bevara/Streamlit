@@ -20,7 +20,7 @@ def set_bg():
         }}
 
         .block-container {{
-            background-color: rgba(173, 216, 230, 0.90);
+            background-color: rgb(30, 144, 255);
             padding: 2rem;
             border-radius: 15px;
         }}
@@ -132,4 +132,5 @@ if st.button("💡 Suggest More Policies"):
 
         st.success("Recommended Policies")
         st.write(suggestions)
+
 
