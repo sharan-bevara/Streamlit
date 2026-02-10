@@ -11,7 +11,6 @@ def set_bg():
     st.markdown(
         f"""
         <style>
-        /* App background image */
         .stApp {{
             background-image: url("{bg_url}");
             background-size: cover;
@@ -20,40 +19,10 @@ def set_bg():
             background-attachment: fixed;
         }}
 
-        /* Main content panel (dark background for dark mode) */
-        [data-testid="stAppViewContainer"] {{
-            background-color: #121212 !important;  /* Dark background */
-            color: #E0E0E0 !important;  /* Light gray text for readability */
+        .block-container {{
+            background-color: rgba(255,255,255,0.9);
             padding: 2rem;
             border-radius: 15px;
-        }}
-
-        /* Headings */
-        h1, h2, h3 {{
-            color: #E0E0E0 !important;  /* Light gray for headings */
-        }}
-
-        /* Buttons */
-        .stButton>button {{
-            background-color: #00B0FF !important;  /* Vibrant cyan-blue for contrast */
-            color: white !important;
-            border-radius: 8px !important;
-        }}
-
-        /* Sidebar background - dark gray / navy */
-        [data-testid="stSidebar"] {{
-            background-color: #1F1F1F !important;  /* Dark gray / navy */
-            color: #E0E0E0 !important;  /* Light text */
-        }}
-
-        /* Sidebar text color */
-        [data-testid="stSidebar"] * {{
-            color: #E0E0E0 !important;  /* Light gray text for readability */
-        }}
-
-        /* Top-right menu / header - matching dark theme */
-        [data-testid="stHeader"] {{
-            background-color: #1F1F1F !important;  /* Dark gray / navy */
         }}
         </style>
         """,
@@ -163,6 +132,3 @@ if st.button("💡 Suggest More Policies"):
 
         st.success("Recommended Policies")
         st.write(suggestions)
-
-
-
