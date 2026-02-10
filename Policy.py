@@ -12,17 +12,17 @@ def set_bg():
         f"""
         <style>
         .stApp {{
-            background-image: url("{bg_url}");
+            background-image: url("{bg_url}");  /* Keeps the background image */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
         }}
 
-        /* Main content panel background (dark blue-gray) */
+        /* Fixed background for both light and dark modes */
         .block-container {{
-            background-color: rgb(54, 69, 79);  /* Dark blue-gray background */
-            color: #E0E0E0;  /* Light text for contrast */
+            background-color: rgba(54, 69, 79, 0.8);  /* Fixed dark blue-gray background with transparency */
+            color: #E0E0E0;  /* Light gray text for contrast */
             padding: 2rem;
             border-radius: 15px;
         }}
@@ -148,6 +148,7 @@ if st.button("💡 Suggest More Policies"):
 
         st.success("Recommended Policies")
         st.write(suggestions)
+
 
 
 
