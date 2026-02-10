@@ -19,10 +19,26 @@ def set_bg():
             background-attachment: fixed;
         }}
 
+        /* Main content panel background (dark blue-gray) */
         .block-container {{
-            background-color: rgb(54, 69, 79);
+            background-color: rgb(54, 69, 79);  /* Dark blue-gray background */
+            color: #E0E0E0;  /* Light text for contrast */
             padding: 2rem;
             border-radius: 15px;
+        }}
+
+        /* Headings */
+        .block-container h1, 
+        .block-container h2, 
+        .block-container h3 {{
+            color: #E0E0E0;  /* Light headings for readability */
+        }}
+
+        /* Optional: style buttons to stand out */
+        .stButton>button {{
+            background-color: #00B0FF;  /* Vibrant blue button */
+            color: white;
+            border-radius: 8px;
         }}
         </style>
         """,
@@ -132,6 +148,7 @@ if st.button("💡 Suggest More Policies"):
 
         st.success("Recommended Policies")
         st.write(suggestions)
+
 
 
 
