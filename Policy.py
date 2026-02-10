@@ -11,6 +11,7 @@ def set_bg():
     st.markdown(
         f"""
         <style>
+        /* App background image */
         .stApp {{
             background-image: url("{bg_url}");
             background-size: cover;
@@ -19,10 +20,39 @@ def set_bg():
             background-attachment: fixed;
         }}
 
-        .block-container {{
-            background-color: rgba(255,255,255,0.9);
+        /* Main content panel (dark semi-transparent for dark mode) */
+        [data-testid="stAppViewContainer"] {{
+            background-color: rgba(30, 30, 30, 0.85) !important;
+            color: #F0F0F0 !important;
             padding: 2rem;
             border-radius: 15px;
+        }}
+
+        /* Headings */
+        h1, h2, h3 {{
+            color: #FFFFFF !important;
+        }}
+
+        /* Buttons */
+        .stButton>button {{
+            background-color: #0099FF !important;
+            color: white !important;
+            border-radius: 8px !important;
+        }}
+
+        /* Sidebar (menu) background - skin color */
+        [data-testid="stSidebar"] {{
+            background-color: #fddbb0 !important; /* skin tone */
+        }}
+
+        /* Sidebar text color */
+        [data-testid="stSidebar"] * {{
+            color: #000000 !important;
+        }}
+
+        /* Top-right menu / header - skin color */
+        [data-testid="stHeader"] {{
+            background-color: #fddbb0 !important;
         }}
         </style>
         """,
@@ -132,3 +162,4 @@ if st.button("💡 Suggest More Policies"):
 
         st.success("Recommended Policies")
         st.write(suggestions)
+
