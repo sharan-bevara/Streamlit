@@ -160,6 +160,11 @@ if st.session_state.page == "form":
             # Change the page state to "policy_details_page"
             st.session_state.page = "policy_details_page"
             st.experimental_rerun()  # Rerun the app to display the second page
+            try:
+                st.experimental_rerun()  
+            except AttributeError as e:
+                st.error(f"Error while rerunning the app: {e}")
+
 
 # ---------- PAGE 2: SHOW POLICY DETAILS ----------
 if st.session_state.page == "policy_details_page":
@@ -189,3 +194,4 @@ if st.session_state.page == "policy_details_page":
             suggestions = suggest_policies(age, gender)
         st.success("Recommended Policies")
         st.write(suggestions)
+
