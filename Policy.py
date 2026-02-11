@@ -77,22 +77,25 @@ client = OpenAI(api_key=st.secrets["Open_API_Key"])
 
 # ---------- FUNCTIONS ----------
 
-def suggest_policies(age, gender):
+def get_policy_details(name, age, policy_name):
     prompt = f"""
-    Suggest 5 best insurance policies for:
+    Customer Details:
+    Name: {name}
     Age: {age}
-    Gender: {gender}
+    Policy Name: {policy_name}
     
-    Include:
-    - policy name
-    - premium range
-    - why suitable
+    Please explain the details of the policy clearly, including:
+    - Coverage
+    - Benefits
+    - Premium
+    - Maturity
+    - Claim process
     """
     
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are an insurance advisor."},
+            {"role": "system", "content": "You are an insurance assistant."},
             {"role": "user", "content": prompt}
         ],
         temperature=0.5
@@ -125,25 +128,25 @@ if st.button("📥 Submit"):
         st.session_state.policy_no = policy_no
         st.session_state.policy_name = policy_name
         
-        # Set the page state to "policy_suggestions"
-        st.session_state.page = "policy_suggestions"
+        # Set the page state to "policy_details_page"
+        st.session_state.page = "policy_details_page"
 
-# ---------- Page 2: Suggest More Policies ----------
-if "page" in st.session_state and st.session_state.page == "policy_suggestions":
+# ---------- Page 2: Show Policy Details ----------
+if "page" in st.session_state and st.session_state.page == "policy_details_page":
     # Get user data from session_state
     name = st.session_state.name
     age = st.session_state.age
-    gender = st.session_state.gender
-    phone = st.session_state.phone
-    policy_no = st.session_state.policy_no
     policy_name = st.session_state.policy_name
-
-    # Display the suggested policies only after redirect
-    if age == 0:
-        st.error("Please enter age")
-    else:
-        with st.spinner("Finding best policies..."):
-            suggestions = suggest_policies(age, gender)
-
-        st.success("Recommended Policies")
-        st.write(suggestions)
+    
+    # Show entered details to the user
+    st.subheader("Entered Customer Details:")
+    st.write(f"**Name**: {name}")
+    st.write(f"**Age**: {age}")
+    st.write(f"**Policy Name**: {policy_name}")
+    
+    # Fetch and display policy details
+    with st.spinner("Fetching policy details..."):
+        policy_details = get_policy_details(name, age, policy_name)
+    
+    st.success("Policy Details")
+    st.write(policy_details)
