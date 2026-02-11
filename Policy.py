@@ -70,43 +70,12 @@ def set_bg():
 set_bg()
 
 # ---------- TITLE ----------
-st.title("🛡️ Streamlit")
+st.title("🛡️ Policy Assistant")
 
 # ---------- OPENAI ----------
 client = OpenAI(api_key=st.secrets["Open_API_Key"])
 
 # ---------- FUNCTIONS ----------
-
-def generate_policy_details(name, age, gender, phone, policy_no, policy_name):
-
-    prompt = f"""
-Customer Details:
-Name: {name}
-Age: {age}
-Gender: {gender}
-Phone: {phone}
-Policy Number: {policy_no}
-Policy Name: {policy_name}
-
-Explain the policy clearly with:
-- Coverage
-- Benefits
-- Premium
-- Maturity
-- Claim process
-"""
-
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are an insurance assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.3
-    )
-
-    return response.choices[0].message.content
-
 
 def suggest_policies(age, gender):
 
@@ -145,23 +114,30 @@ policy_name = st.text_input("Policy Name")
 
 st.divider()
 
-# ---------- BUTTON 1 ----------
-if st.button("📄 Generate Policy Details"):
+# ---------- BUTTON 1 (Submit Button) ----------
+if st.button("📥 Submit"):
     if not (name and phone and policy_no and policy_name):
         st.error("Please fill all fields")
     else:
-        with st.spinner("Generating policy details..."):
-            reply = generate_policy_details(
-                name, age, gender, phone, policy_no, policy_name
-            )
+        # Redirecting to the next page with query params
+        st.experimental_set_query_params(
+            name=name, age=age, gender=gender, phone=phone, policy_no=policy_no, policy_name=policy_name
+        )
+        st.experimental_rerun()
 
-        st.success("Policy Information")
-        st.write(reply)
+# ---------- Page 2: Suggest More Policies ----------
+query_params = st.experimental_get_query_params()
 
-st.divider()
+if query_params:
+    # Extract user input from query params
+    name = query_params.get("name", [None])[0]
+    age = int(query_params.get("age", [0])[0])
+    gender = query_params.get("gender", ["Male"])[0]
+    phone = query_params.get("phone", [None])[0]
+    policy_no = query_params.get("policy_no", [None])[0]
+    policy_name = query_params.get("policy_name", [None])[0]
 
-# ---------- BUTTON 2 ----------
-if st.button("💡 Suggest More Policies"):
+    # Display the suggested policies only after redirect
     if age == 0:
         st.error("Please enter age")
     else:
@@ -170,10 +146,4 @@ if st.button("💡 Suggest More Policies"):
 
         st.success("Recommended Policies")
         st.write(suggestions)
-
-
-
-
-
-
 
