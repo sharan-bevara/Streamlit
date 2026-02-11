@@ -125,9 +125,8 @@ if st.button("📥 Submit"):
         st.session_state.policy_no = policy_no
         st.session_state.policy_name = policy_name
         
-        # Redirect to the second page (where suggestions will be shown)
+        # Set the page state to "policy_suggestions"
         st.session_state.page = "policy_suggestions"
-        st.experimental_rerun()
 
 # ---------- Page 2: Suggest More Policies ----------
 if "page" in st.session_state and st.session_state.page == "policy_suggestions":
