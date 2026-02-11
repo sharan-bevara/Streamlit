@@ -127,6 +127,7 @@ if st.button("📥 Submit"):
         
         # Set the page state to "policy_suggestions"
         st.session_state.page = "policy_suggestions"
+        st.experimental_rerun()  # Force the app to rerun and refresh to show the second page
 
 # ---------- Page 2: Suggest More Policies ----------
 if "page" in st.session_state and st.session_state.page == "policy_suggestions":
