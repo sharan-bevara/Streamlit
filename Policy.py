@@ -78,18 +78,17 @@ client = OpenAI(api_key=st.secrets["Open_API_Key"])
 # ---------- FUNCTIONS ----------
 
 def suggest_policies(age, gender):
-
     prompt = f"""
-Suggest 5 best insurance policies for:
-Age: {age}
-Gender: {gender}
-
-Include:
-- policy name
-- premium range
-- why suitable
-"""
-
+    Suggest 5 best insurance policies for:
+    Age: {age}
+    Gender: {gender}
+    
+    Include:
+    - policy name
+    - premium range
+    - why suitable
+    """
+    
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -100,7 +99,6 @@ Include:
     )
 
     return response.choices[0].message.content
-
 
 # ---------- USER INPUT ----------
 st.subheader("Enter Customer Details")
@@ -119,23 +117,27 @@ if st.button("📥 Submit"):
     if not (name and phone and policy_no and policy_name):
         st.error("Please fill all fields")
     else:
-        # Redirecting to the next page with query params
-        st.experimental_set_query_params(
-            name=name, age=age, gender=gender, phone=phone, policy_no=policy_no, policy_name=policy_name
-        )
+        # Store the user input in session_state for page transition
+        st.session_state.name = name
+        st.session_state.age = age
+        st.session_state.gender = gender
+        st.session_state.phone = phone
+        st.session_state.policy_no = policy_no
+        st.session_state.policy_name = policy_name
+        
+        # Redirect to the second page (where suggestions will be shown)
+        st.session_state.page = "policy_suggestions"
         st.experimental_rerun()
 
 # ---------- Page 2: Suggest More Policies ----------
-query_params = st.experimental_get_query_params()
-
-if query_params:
-    # Extract user input from query params
-    name = query_params.get("name", [None])[0]
-    age = int(query_params.get("age", [0])[0])
-    gender = query_params.get("gender", ["Male"])[0]
-    phone = query_params.get("phone", [None])[0]
-    policy_no = query_params.get("policy_no", [None])[0]
-    policy_name = query_params.get("policy_name", [None])[0]
+if "page" in st.session_state and st.session_state.page == "policy_suggestions":
+    # Get user data from session_state
+    name = st.session_state.name
+    age = st.session_state.age
+    gender = st.session_state.gender
+    phone = st.session_state.phone
+    policy_no = st.session_state.policy_no
+    policy_name = st.session_state.policy_name
 
     # Display the suggested policies only after redirect
     if age == 0:
@@ -146,4 +148,3 @@ if query_params:
 
         st.success("Recommended Policies")
         st.write(suggestions)
-
