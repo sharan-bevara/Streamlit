@@ -70,52 +70,57 @@ def set_bg():
 set_bg()
 
 # ---------- TITLE ----------
-st.title("🛡️ Policy Assistant")
+st.title("🛡️ Streamlit")
 
 # ---------- OPENAI ----------
 client = OpenAI(api_key=st.secrets["Open_API_Key"])
 
 # ---------- FUNCTIONS ----------
 
-def get_policy_details(name, age, gender, policy_name):
+def generate_policy_details(name, age, gender, phone, policy_no, policy_name):
+
     prompt = f"""
-    Customer Details:
-    Name: {name}
-    Age: {age}
-    Gender: {gender}
-    Policy Name: {policy_name}
-    
-    Please explain the details of the policy clearly, including:
-    - Coverage
-    - Benefits
-    - Premium
-    - Maturity
-    - Claim process
-    """
-    
+Customer Details:
+Name: {name}
+Age: {age}
+Gender: {gender}
+Phone: {phone}
+Policy Number: {policy_no}
+Policy Name: {policy_name}
+
+Explain the policy clearly with:
+- Coverage
+- Benefits
+- Premium
+- Maturity
+- Claim process
+"""
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are an insurance assistant."},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.5
+        temperature=0.3
     )
 
     return response.choices[0].message.content
 
+
 def suggest_policies(age, gender):
+
     prompt = f"""
-    Suggest 5 best insurance policies for:
-    Age: {age}
-    Gender: {gender}
-    
-    Include:
-    - policy name
-    - premium range
-    - why suitable
-    """
-    
+Suggest 5 best insurance policies for:
+Age: {age}
+Gender: {gender}
+
+Include:
+- policy name
+- premium range
+- why suitable
+"""
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -127,71 +132,41 @@ def suggest_policies(age, gender):
 
     return response.choices[0].message.content
 
+
 # ---------- USER INPUT ----------
-if "page" not in st.session_state:
-    st.session_state.page = "form"  # Default to the form page
+st.subheader("Enter Customer Details")
 
-# ---------- PAGE 1: USER INPUT FORM ----------
-if st.session_state.page == "form":
-    st.subheader("Enter Customer Details")
+name = st.text_input("Full Name")
+age = st.number_input("Age", 0, 100)
+gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+phone = st.text_input("Phone Number")
+policy_no = st.text_input("Policy Number")
+policy_name = st.text_input("Policy Name")
 
-    name = st.text_input("Full Name")
-    age = st.number_input("Age", 0, 100)
-    gender = st.selectbox("Gender", ["Male", "Female", "Other"])
-    phone = st.text_input("Phone Number")
-    policy_no = st.text_input("Policy Number")
-    policy_name = st.text_input("Policy Name")
+st.divider()
 
-    st.divider()
+# ---------- BUTTON 1 ----------
+if st.button("📄 Generate Policy Details"):
+    if not (name and phone and policy_no and policy_name):
+        st.error("Please fill all fields")
+    else:
+        with st.spinner("Generating policy details..."):
+            reply = generate_policy_details(
+                name, age, gender, phone, policy_no, policy_name
+            )
 
-    # ---------- BUTTON 1 (Submit Button) ----------
-    if st.button("📥 Submit"):
-        if not (name and phone and policy_no and policy_name):
-            st.error("Please fill all fields")
-        else:
-            # Store the user input in session_state for page transition
-            st.session_state.name = name
-            st.session_state.age = age
-            st.session_state.gender = gender
-            st.session_state.phone = phone
-            st.session_state.policy_no = policy_no
-            st.session_state.policy_name = policy_name
-            
-            # Change the page state to "policy_details_page"
-            st.session_state.page = "policy_details_page"
-            st.experimental_rerun()  # Rerun the app to display the second page
-            try:
-                st.experimental_rerun()  
-            except AttributeError as e:
-                st.error(f"Error while rerunning the app: {e}")
+        st.success("Policy Information")
+        st.write(reply)
 
+st.divider()
 
-# ---------- PAGE 2: SHOW POLICY DETAILS ----------
-if st.session_state.page == "policy_details_page":
-    # Get user data from session_state
-    name = st.session_state.name
-    age = st.session_state.age
-    gender = st.session_state.gender
-    policy_name = st.session_state.policy_name
-    
-    # Show entered details to the user
-    st.subheader("Entered Customer Details:")
-    st.write(f"**Name**: {name}")
-    st.write(f"**Age**: {age}")
-    st.write(f"**Gender**: {gender}")
-    st.write(f"**Policy Name**: {policy_name}")
-    
-    # Fetch and display policy details
-    with st.spinner("Fetching policy details..."):
-        policy_details = get_policy_details(name, age, gender, policy_name)
-    
-    st.success("Policy Details")
-    st.write(policy_details)
-
-    # ---------- BUTTON FOR SUGGESTING MORE POLICIES ----------
-    if st.button("💡 Suggest More Policies"):
+# ---------- BUTTON 2 ----------
+if st.button("💡 Suggest More Policies"):
+    if age == 0:
+        st.error("Please enter age")
+    else:
         with st.spinner("Finding best policies..."):
             suggestions = suggest_policies(age, gender)
+
         st.success("Recommended Policies")
         st.write(suggestions)
-
