@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 
 # Set your OpenAI API key
-openai.api_key = 'your_openai_api_key'
+openai.api_key = 'Open_API_Key'
 
 # Function to query GPT for policy details
 def get_policy_details(username, age, gender, phone_number, policy_number, policy_name):
@@ -57,4 +57,5 @@ if st.button("Get Policy Details"):
             st.error("Please fill in all the required fields.")
     else:
         st.error("Please enter a valid 10-digit phone number.")
+
 
