@@ -1,2 +1,3 @@
 streamlit==1.17.0
 openai==0.27.0
+altair==4.2.2  # Add Altair here to fix the missing dependency error
