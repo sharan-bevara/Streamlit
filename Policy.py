@@ -1,8 +1,9 @@
 import streamlit as st
 import openai
+import os
 
-# Set your OpenAI API key using Streamlit secrets management
-openai.api_key = st.secrets["openai"]["api_key"]  # Make sure to set this in Streamlit secrets
+# Set your OpenAI API key using Streamlit's secrets management (no hardcoding the API key)
+openai.api_key = st.secrets["openai"]["api_key"]
 
 # Function to query GPT for policy details
 def get_policy_details(username, age, gender, phone_number, policy_number, policy_name):
@@ -21,7 +22,7 @@ def get_policy_details(username, age, gender, phone_number, policy_number, polic
     try:
         # Request to OpenAI's GPT model
         response = openai.Completion.create(
-            model="gpt-3.5-turbo",  # Or you can use "gpt-4" if available
+            model="gpt-3.5-turbo",  # You can use "gpt-4" if you have access
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that provides accurate policy details."},
                 {"role": "user", "content": prompt}
