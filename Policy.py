@@ -1,233 +1,172 @@
-import pandas as pd
-import json
-import asyncio
-import os
-import sys
 import streamlit as st
-from openai import AsyncOpenAI
+from openai import OpenAI
 
-# ================== CONFIG ==================
-API_KEY = "sk-REPLACE_WITH_YOUR_KEY"   # 🔴 use Streamlit secrets in production
+# ---------- PAGE CONFIG ----------
+st.set_page_config(page_title="Policy Assistant", layout="centered")
 
-CSV_FILE = "/Users/s-hydfrontdesk/Downloads/SchemeData2301262313SS.csv"
-OUTPUT_FILE = "MutualFund_Final_Output.xlsx"
+# ---------- BACKGROUND IMAGE ----------
+def set_bg():
+    bg_url = "https://images.unsplash.com/photo-1521791136064-7986c2920216"
 
-MAX_FUNDS = None              # None = all funds
-MAX_CONCURRENT_REQUESTS = 5
-MODEL = "gpt-4.1"
-# ============================================
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("{bg_url}");  /* Keeps the background image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }}
+
+        /* Main content panel (background and text color) */
+        .block-container {{
+            background-color: rgba(54, 69, 79, 0.8);  /* Dark blue-gray background with transparency */
+            color: #E0E0E0;  /* Light gray text for contrast */
+            padding: 2rem;
+            border-radius: 15px;
+        }}
+
+        /* Headings */
+        .block-container h1, 
+        .block-container h2, 
+        .block-container h3 {{
+            color: #E0E0E0;  /* Light headings for readability */
+        }}
+
+        /* Buttons */
+        .stButton>button {{
+            background-color: #00B0FF;  /* Vibrant blue button */
+            color: white;
+            border-radius: 8px;
+        }}
+
+        /* Sidebar background - dark gray / navy */
+        [data-testid="stSidebar"] {{
+            background-color: #1F1F1F !important;  /* Dark gray / navy */
+            color: #E0E0E0 !important;  /* Light text */
+        }}
+
+        /* Sidebar text color */
+        [data-testid="stSidebar"] * {{
+            color: #E0E0E0 !important;  /* Light gray text for readability */
+        }}
+
+        /* Top-right menu / header - matching dark theme */
+        [data-testid="stHeader"] {{
+            background-color: #1F1F1F !important;  /* Dark gray / navy */
+        }}
+
+        /* Apply white color to input labels */
+        .stTextInput label, .stNumberInput label, .stSelectbox label {{
+            color: #FFFFFF !important;  /* White labels for input fields */
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 
-def safe_float(value, default=0):
-    try:
-        return float(value)
-    except:
-        return default
+set_bg()
 
+# ---------- TITLE ----------
+st.title("🛡️ Streamlit")
 
-def validate_weightage_sum(weightage):
-    total = sum(weightage.values())
-    if total != 100:
-        raise ValueError(f"❌ Weightage sum must be 100, but got {total}")
-    print("✅ Weightage validation passed (Total = 100)")
+# ---------- OPENAI ----------
+client = OpenAI(api_key=st.secrets["Open_API_Key"])
 
+# ---------- FUNCTIONS ----------
 
-async def fetch_scheme_data(scheme, client, semaphore):
+def generate_policy_details(name, age, gender, phone, policy_no, policy_name):
+
     prompt = f"""
-    Provide financial data for the mutual fund scheme "{scheme}".
+Customer Details:
+Name: {name}
+Age: {age}
+Gender: {gender}
+Phone: {phone}
+Policy Number: {policy_no}
+Policy Name: {policy_name}
 
-    Return ONLY valid JSON:
-    {{
-        "AUM": number,
-        "TER": number,
-        "PE": number,
-        "PB": number,
-        "Top3TotalPercent": number,
-        "Top5TotalPercent": number,
-        "Top10TotalPercent": number,
-        "Top20TotalPercent": number,
-        "Sharpe": number,
-        "Sortino": number,
-        "StdDev": number,
-        "InceptionReturn": number,
-        "Age": number
-    }}
-    """
+Explain the policy clearly with:
+- Coverage
+- Benefits
+- Premium
+- Maturity
+- Claim process
+"""
 
-    async with semaphore:
-        try:
-            response = await client.responses.create(
-                model=MODEL,
-                input=prompt
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are an insurance assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.3
+    )
+
+    return response.choices[0].message.content
+
+
+def suggest_policies(age, gender):
+
+    prompt = f"""
+Suggest 5 best insurance policies for:
+Age: {age}
+Gender: {gender}
+
+Include:
+- policy name
+- premium range
+- why suitable
+"""
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are an insurance advisor."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.5
+    )
+
+    return response.choices[0].message.content
+
+
+# ---------- USER INPUT ----------
+st.subheader("Enter Customer Details")
+
+name = st.text_input("Full Name")
+age = st.number_input("Age", 0, 100)
+gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+phone = st.text_input("Phone Number")
+policy_no = st.text_input("Policy Number")
+policy_name = st.text_input("Policy Name")
+
+st.divider()
+
+# ---------- BUTTON 1 ----------
+if st.button("📄 Generate Policy Details"):
+    if not (name and phone and policy_no and policy_name):
+        st.error("Please fill all fields")
+    else:
+        with st.spinner("Generating policy details..."):
+            reply = generate_policy_details(
+                name, age, gender, phone, policy_no, policy_name
             )
 
-            data = json.loads(response.output_text)
+        st.success("Policy Information")
+        st.write(reply)
 
-            return {
-                "Fund Name": scheme,
-                "AUM": safe_float(data.get("AUM")),
-                "TER": safe_float(data.get("TER")),
-                "PE": safe_float(data.get("PE")),
-                "PB": safe_float(data.get("PB")),
-                "Top 3 Holdings": safe_float(data.get("Top3TotalPercent")),
-                "Top 5 Holdings": safe_float(data.get("Top5TotalPercent")),
-                "Top 10 Holdings": safe_float(data.get("Top10TotalPercent")),
-                "Top 20 Holdings": safe_float(data.get("Top20TotalPercent")),
-                "Sharpe": safe_float(data.get("Sharpe")),
-                "Sortino": safe_float(data.get("Sortino")),
-                "Std Dev": safe_float(data.get("StdDev")),
-                "Inception %": safe_float(data.get("InceptionReturn")),
-                "Age (Years)": safe_float(data.get("Age")),
-            }
+st.divider()
 
-        except Exception as e:
-            print(f"\n⚠️ Error fetching {scheme}: {e}")
-            return None
+# ---------- BUTTON 2 ----------
+if st.button("💡 Suggest More Policies"):
+    if age == 0:
+        st.error("Please enter age")
+    else:
+        with st.spinner("Finding best policies..."):
+            suggestions = suggest_policies(age, gender)
 
-
-async def main():
-    client = AsyncOpenAI(api_key=API_KEY)
-    semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
-
-    # ---------------- READ CSV ----------------
-    df = pd.read_csv(CSV_FILE)
-
-    required_cols = ["Scheme NAV Name", "Scheme Category"]
-    missing = [c for c in required_cols if c not in df.columns]
-    if missing:
-        raise ValueError(f"❌ Missing required columns: {missing}")
-
-    # ---------------- FILTER: EQUITY SCHEME ----------------
-    df["Category_Main"] = (
-        df["Scheme Category"]
-        .astype(str)
-        .str.split("-", n=1)
-        .str[0]
-        .str.strip()
-    )
-
-    equity_df = df[df["Category_Main"] == "Equity Scheme"]
-
-    schemes = (
-        equity_df["Scheme NAV Name"]
-        .dropna()
-        .unique()
-        .tolist()
-    )
-
-    schemes = schemes[:MAX_FUNDS] if MAX_FUNDS else schemes
-    total = len(schemes)
-
-    st.write(f"✅ Selected **{total}** Equity Scheme funds")
-
-    # ---------------- ASYNC FETCH ----------------
-    tasks = [fetch_scheme_data(s, client, semaphore) for s in schemes]
-
-    results = []
-    progress = st.progress(0)
-    completed = 0
-
-    for coro in asyncio.as_completed(tasks):
-        result = await coro
-        completed += 1
-
-        if result:
-            results.append(result)
-
-        progress.progress(completed / total)
-
-    st.success("✅ All funds processed")
-
-    # ---------------- DATAFRAME ----------------
-    columns = [
-        "Fund Name", "AUM", "TER", "PE", "PB",
-        "Top 3 Holdings", "Top 5 Holdings",
-        "Top 10 Holdings", "Top 20 Holdings",
-        "Sharpe", "Sortino", "Std Dev",
-        "Inception %", "Age (Years)"
-    ]
-
-    data_df = pd.DataFrame(results, columns=columns)
-
-    # ---------------- WEIGHTAGE ----------------
-    weightage = {
-        "AUM": 9, "TER": 8, "PE": 7, "PB": 7,
-        "Top 3 Holdings": 6, "Top 5 Holdings": 6,
-        "Top 10 Holdings": 6, "Top 20 Holdings": 6,
-        "Sharpe": 15, "Sortino": 13,
-        "Std Dev": 9, "Inception %": 3,
-        "Age (Years)": 5
-    }
-
-    higher_lower = {
-        "AUM": "Higher", "TER": "Lower", "PE": "Lower", "PB": "Lower",
-        "Top 3 Holdings": "Higher", "Top 5 Holdings": "Higher",
-        "Top 10 Holdings": "Higher", "Top 20 Holdings": "Higher",
-        "Sharpe": "Higher", "Sortino": "Higher",
-        "Std Dev": "Lower", "Inception %": "Higher",
-        "Age (Years)": "Higher"
-    }
-
-    validate_weightage_sum(weightage)
-
-    # ---------------- SCORE ----------------
-    scores = []
-
-    for _, row in data_df.iterrows():
-        score = 0
-        for col, wt in weightage.items():
-            val = safe_float(row[col])
-            score += wt * val if higher_lower[col] == "Higher" else -wt * val
-        scores.append(score)
-
-    data_df["Score"] = scores
-
-    # ---------------- SORT + RANK ----------------
-    data_df = data_df.sort_values(
-        by=["Score", "Fund Name"],
-        ascending=[False, True]
-    ).reset_index(drop=True)
-
-    data_df["Rank"] = (
-        data_df["Score"]
-        .rank(method="first", ascending=False)
-        .astype(int)
-    )
-
-    # ---------------- FINAL OUTPUT ----------------
-    weightage_row = {"Fund Name": "Weightage", **weightage, "Score": "", "Rank": ""}
-    hl_row = {"Fund Name": "Higher/Lower", **higher_lower, "Score": "", "Rank": ""}
-
-    final_df = pd.concat(
-        [pd.DataFrame([weightage_row]), pd.DataFrame([hl_row]), data_df],
-        ignore_index=True
-    )
-
-    final_df.to_excel(OUTPUT_FILE, index=False)
-
-    st.dataframe(final_df, use_container_width=True)
-
-    return OUTPUT_FILE
-
-
-# ================= STREAMLIT UI =================
-if __name__ == "__main__":
-
-    st.set_page_config(page_title="Mutual Fund Scoring Engine", layout="wide")
-
-    st.title("📊 Mutual Fund Scoring Engine")
-    st.write("Fetch → Score → Rank → Export mutual funds")
-
-    if st.button("🚀 Run Analysis"):
-        with st.spinner("Processing funds..."):
-            output_file = asyncio.run(main())
-
-        st.success("🎉 Analysis completed")
-
-        with open(output_file, "rb") as f:
-            st.download_button(
-                "⬇️ Download Excel Output",
-                f,
-                file_name=OUTPUT_FILE,
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+        st.success("Recommended Policies")
+        st.write(suggestions)
