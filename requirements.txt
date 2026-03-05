@@ -1,4 +1,5 @@
-streamlit>=1.26.0   # compatible with Python 3.13
-pandas>=3.0.0
+# requirements.txt
+streamlit>=1.26.0
+pandas>=1.4.0,<3
 pyarrow>=12.0.1
 uuid
